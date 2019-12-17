@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang=en>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Why normalization?I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something. The reason to do normalization is very clear:">
+<meta name="keywords" content="RNA-seq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Normalization methods for RNA-seq">
+<meta property="og:url" content="http://yoursite.com/2019/12/17/RNA-norm/index.html">
+<meta property="og:site_name" content="Chi Lam Poon">
+<meta property="og:description" content="Why normalization?I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something. The reason to do normalization is very clear:">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/gene.length.png">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/gcbias.png">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norxm/seqdepth.png">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/composition.png">
+<meta property="og:updated_time" content="2019-12-17T06:51:34.546Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Normalization methods for RNA-seq">
+<meta name="twitter:description" content="Why normalization?I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something. The reason to do normalization is very clear:">
+<meta name="twitter:image" content="http://yoursite.com/images/posts/RNA-norm/gene.length.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon-new/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-new/android-chrome-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/fbe15844b2cac484bb2b10c24e605040?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>Normalization methods for RNA-seq</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Blog</a></li>
+         
+          <li><a href="/projects/">Projects</a></li>
+         
+          <li><a href="/friends/">Friends</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2019/10/01/美國研究助理申請：大學生找美國研究助理全攻略/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/12/17/RNA-norm/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/17/RNA-norm/&text=Normalization methods for RNA-seq"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/17/RNA-norm/&is_video=false&description=Normalization methods for RNA-seq"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Normalization methods for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/17/RNA-norm/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/17/RNA-norm/&name=Normalization methods for RNA-seq&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-normalization"><span class="toc-number">1.</span> <span class="toc-text">Why normalization?</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Within-sample"><span class="toc-number">1.0.1.</span> <span class="toc-text">Within sample:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Between-sample"><span class="toc-number">1.0.2.</span> <span class="toc-text">Between sample:</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Normalization-methods"><span class="toc-number">2.</span> <span class="toc-text">Normalization methods</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Normalization methods for RNA-seq
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Chi Lam Poon</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-12-17T05:49:03.000Z" itemprop="datePublished">2019-12-17</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/RNA-seq/">RNA-seq</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Why-normalization"><a href="#Why-normalization" class="headerlink" title="Why normalization?"></a>Why normalization?</h2><p>I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something.</p>
+<p>The reason to do normalization is very clear: to <strong>FAIRLY</strong> compare the expression values within or between samples. In this <a href="https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html" target="_blank" rel="noopener">article</a>, the author explained quite well, however I found something wrong in the table of normalization methods, so be careful! Mainly, these are factors need to be considered (images were borrowed from that post):</p>
+<h4 id="Within-sample"><a href="#Within-sample" class="headerlink" title="Within sample:"></a>Within sample:</h4><ul>
+<li><p><strong>Gene length</strong>: longer gene would have more counts</p>
+<img src="/images/posts/RNA-norm/gene.length.png" alt="gene length" width="250">
+</li>
+<li><p><strong>GC-content</strong>: GC-rich and GC-poor fragments tend to be under-represented</p>
+<img src="/images/posts/RNA-norm/gcbias.png" alt="GC" width="650">
+</li>
+<li><p><strong>Sequence position</strong>: RNA degradation, I am still not sure about it, explain it later</p>
+</li>
+</ul>
+<h4 id="Between-sample"><a href="#Between-sample" class="headerlink" title="Between sample:"></a>Between sample:</h4><ul>
+<li><p><strong>Sequencing depth</strong>: the total amout of RNA varies in each sample</p>
+<img src="/images/posts/RNA-norxm/seqdepth.png" alt="depth" width="650">
+</li>
+<li><p><strong>RNA composition</strong>: maybe some sample-specific genes highly expressed or contamination</p>
+<img src="/images/posts/RNA-norm/composition.png" alt="composition" width="650">
+
+
+</li>
+</ul>
+<h2 id="Normalization-methods"><a href="#Normalization-methods" class="headerlink" title="Normalization methods"></a>Normalization methods</h2>
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+    <div class="friends-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Blog</a></li>
+         
+          <li><a href="/projects/">Projects</a></li>
+         
+          <li><a href="/friends/">Friends</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-normalization"><span class="toc-number">1.</span> <span class="toc-text">Why normalization?</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Within-sample"><span class="toc-number">1.0.1.</span> <span class="toc-text">Within sample:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Between-sample"><span class="toc-number">1.0.2.</span> <span class="toc-text">Between sample:</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Normalization-methods"><span class="toc-number">2.</span> <span class="toc-text">Normalization methods</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/12/17/RNA-norm/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/17/RNA-norm/&text=Normalization methods for RNA-seq"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/17/RNA-norm/&is_video=false&description=Normalization methods for RNA-seq"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Normalization methods for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/17/RNA-norm/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/17/RNA-norm/&title=Normalization methods for RNA-seq"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/17/RNA-norm/&name=Normalization methods for RNA-seq&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 Chilam
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Blog</a></li>
+         
+          <li><a href="/projects/">Projects</a></li>
+         
+          <li><a href="/friends/">Friends</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'darklings';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
+</body>
+</html>
