@@ -14,14 +14,15 @@
 <meta property="og:site_name" content="Chi Lam Poon">
 <meta property="og:description" content="Why normalization?I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something. The reason to do normalization is very clear:">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/gene.length.png">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/length.png">
 <meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/gcbias.png">
 <meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/seqdepth.png">
-<meta property="og:updated_time" content="2019-12-17T06:55:14.867Z">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/composition.png">
+<meta property="og:updated_time" content="2019-12-17T06:58:59.898Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Normalization methods for RNA-seq">
 <meta name="twitter:description" content="Why normalization?I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something. The reason to do normalization is very clear:">
-<meta name="twitter:image" content="http://yoursite.com/images/posts/RNA-norm/gene.length.png">
+<meta name="twitter:image" content="http://yoursite.com/images/posts/RNA-norm/length.png">
     
     
         
@@ -152,10 +153,10 @@
 
   <div class="content" itemprop="articleBody">
     <h2 id="Why-normalization"><a href="#Why-normalization" class="headerlink" title="Why normalization?"></a>Why normalization?</h2><p>I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something.</p>
-<p>The reason to do normalization is very clear: to <strong>FAIRLY</strong> compare the expression values within or between samples. In this <a href="https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html" target="_blank" rel="noopener">article</a>, the author explained quite well, however I found something wrong in the table of normalization methods, so be careful! Mainly, these are factors need to be considered (images were borrowed from that post):</p>
+<p>The reason to do normalization is very clear: to <strong>FAIRLY</strong> compare the expression values within or between samples. In this <a href="https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html" target="_blank" rel="noopener">article</a>, the author explained quite well, however I found something wrong in the table of normalization methods, so be careful! Mainly, these are factors needed to be considered (images were borrowed from that post and this <a href="https://mikelove.wordpress.com/2016/09/26/rna-seq-fragment-sequence-bias/" target="_blank" rel="noopener">post</a>):</p>
 <h4 id="Within-sample"><a href="#Within-sample" class="headerlink" title="Within sample:"></a>Within sample:</h4><ul>
 <li><p><strong>Gene length</strong>: longer gene would have more counts</p>
-<img src="/images/posts/RNA-norm/gene.length.png" alt="gene length" width="250">
+<img src="/images/posts/RNA-norm/length.png" alt="length" width="250">
 </li>
 <li><p><strong>GC-content</strong>: GC-rich and GC-poor fragments tend to be under-represented</p>
 <img src="/images/posts/RNA-norm/gcbias.png" alt="GC" width="700">
@@ -167,7 +168,10 @@
 <li><p><strong>Sequencing depth</strong>: the total amout of RNA varies in each sample</p>
 <img src="/images/posts/RNA-norm/seqdepth.png" alt="depth" width="550">
 </li>
-<li><p><strong>RNA composition</strong>: maybe some sample-specific genes highly expressed or contamination<br>&lt;img src=”/images/posts/RNA-norm/composition.png” alt=”composition” width=”550”, height=”500”/&gt;</p>
+<li><p><strong>RNA composition</strong>: maybe some sample-specific genes highly expressed or contamination</p>
+<img src="/images/posts/RNA-norm/composition.png" alt="composition" width="550" height="500">
+
+
 </li>
 </ul>
 <h2 id="Normalization-methods"><a href="#Normalization-methods" class="headerlink" title="Normalization methods"></a>Normalization methods</h2>
