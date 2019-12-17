@@ -16,9 +16,8 @@
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/gene.length.png">
 <meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/gcbias.png">
-<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norxm/seqdepth.png">
-<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/composition.png">
-<meta property="og:updated_time" content="2019-12-17T06:51:34.546Z">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/seqdepth.png">
+<meta property="og:updated_time" content="2019-12-17T06:55:14.867Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Normalization methods for RNA-seq">
 <meta name="twitter:description" content="Why normalization?I usually make the reasons for every implementation or analysis clear and this is much more important than knowing how to do something. The reason to do normalization is very clear:">
@@ -159,19 +158,16 @@
 <img src="/images/posts/RNA-norm/gene.length.png" alt="gene length" width="250">
 </li>
 <li><p><strong>GC-content</strong>: GC-rich and GC-poor fragments tend to be under-represented</p>
-<img src="/images/posts/RNA-norm/gcbias.png" alt="GC" width="650">
+<img src="/images/posts/RNA-norm/gcbias.png" alt="GC" width="700">
 </li>
 <li><p><strong>Sequence position</strong>: RNA degradation, I am still not sure about it, explain it later</p>
 </li>
 </ul>
 <h4 id="Between-sample"><a href="#Between-sample" class="headerlink" title="Between sample:"></a>Between sample:</h4><ul>
 <li><p><strong>Sequencing depth</strong>: the total amout of RNA varies in each sample</p>
-<img src="/images/posts/RNA-norxm/seqdepth.png" alt="depth" width="650">
+<img src="/images/posts/RNA-norm/seqdepth.png" alt="depth" width="550">
 </li>
-<li><p><strong>RNA composition</strong>: maybe some sample-specific genes highly expressed or contamination</p>
-<img src="/images/posts/RNA-norm/composition.png" alt="composition" width="650">
-
-
+<li><p><strong>RNA composition</strong>: maybe some sample-specific genes highly expressed or contamination<br>&lt;img src=”/images/posts/RNA-norm/composition.png” alt=”composition” width=”550”, height=”500”/&gt;</p>
 </li>
 </ul>
 <h2 id="Normalization-methods"><a href="#Normalization-methods" class="headerlink" title="Normalization methods"></a>Normalization methods</h2>
