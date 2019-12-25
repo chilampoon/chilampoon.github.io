@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang=en>
+<head><meta name="generator" content="Hexo 3.9.0">
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
+<meta name="keywords" content="RNA-seq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Implementations of normalization methods for RNA-seq">
+<meta property="og:url" content="http://yoursite.com/2019/12/25/RNA-norm-implement/index.html">
+<meta property="og:site_name" content="Chi Lam Poon">
+<meta property="og:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/distributions.png">
+<meta property="og:updated_time" content="2019-12-25T09:32:37.601Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Implementations of normalization methods for RNA-seq">
+<meta name="twitter:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
+<meta name="twitter:image" content="http://yoursite.com/images/posts/RNA-norm/distributions.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon-new/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-new/android-chrome-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/fbe15844b2cac484bb2b10c24e605040?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>Implementations of normalization methods for RNA-seq</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Blog</a></li>
+         
+          <li><a href="/projects/">Projects</a></li>
+         
+          <li><a href="/friends/">Friends</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2019/12/17/RNA-norm/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&text=Implementations of normalization methods for RNA-seq"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&is_video=false&description=Implementations of normalization methods for RNA-seq"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Implementations of normalization methods for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&name=Implementations of normalization methods for RNA-seq&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Filter-Genes"><span class="toc-number">1.</span> <span class="toc-text">Filter Genes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Compare-Normalization"><span class="toc-number">2.</span> <span class="toc-text">Compare Normalization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Visualize-distributions"><span class="toc-number">3.</span> <span class="toc-text">Visualize distributions</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Implementations of normalization methods for RNA-seq
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Chi Lam Poon</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-12-25T07:47:48.000Z" itemprop="datePublished">2019-12-25</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/RNA-seq/">RNA-seq</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: <a href="2019/12/17/RNA-norm/index.html">Normalization methods for RNA-seq</a>.</p>
+<p>Actually I was suggested to compare all these methods before doing DE analylsis by Joey, my advisor :P, I thought just using qsmooth was OK, but we finally ended up with tissue-aware quantile normalization.</p>
+<h2 id="Filter-Genes"><a href="#Filter-Genes" class="headerlink" title="Filter Genes"></a>Filter Genes</h2><p>I am manipulating GTEx v8 data, I first filtered lowly-expressed genes after some prepossesses:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">library(edgeR)</span><br><span class="line">tissue.no &lt;- pData(eset) %&gt;%</span><br><span class="line">             group_by(SMTSD) %&gt;%</span><br><span class="line">             summarise(n=n())</span><br><span class="line"></span><br><span class="line"># in tissue-aware manner, refer to YARN paper</span><br><span class="line">min(tissue.no$n) #113</span><br><span class="line">minSamples &lt;- floor(min(tissue.no$n)/2)</span><br><span class="line">cnt.cpm &lt;- cpm(exprs(eset))</span><br><span class="line">keep &lt;- rowSums(cnt.cpm &gt; 1) &gt;= minSamples</span><br><span class="line">eset &lt;- eset[keep,]</span><br><span class="line">dim(eset)</span><br><span class="line">## Features  Samples</span><br><span class="line">##    29212    14437</span><br></pre></td></tr></table></figure>
+
+<h2 id="Compare-Normalization"><a href="#Compare-Normalization" class="headerlink" title="Compare Normalization"></a>Compare Normalization</h2><p>Normalize selected samples in tissue-aware way.</p>
+<ol>
+<li><strong>TMM</strong>: trimmed mean of M-values</li>
+<li><strong>RLE</strong>: relative log expression</li>
+<li><strong>UQ</strong>: upper quartile</li>
+<li><strong>DESeq</strong>: median-ratio-scaling</li>
+<li><strong>QN</strong>: quantile normalization</li>
+<li><strong>qsmooth</strong>: smooth quantile normalization</li>
+<li><strong>none</strong>: original data</li>
+</ol>
+<p>The following is a simple function to perform all of these, extended the one in <code>yarn</code>.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">## tissue aware normalization, all returing log2(CPM + 1) since limma uses CPM</span><br><span class="line">tissue.aware.norm &lt;- function(eset, tissues, method=c(&apos;TMM&apos;, &apos;RLE&apos;, &apos;UQ&apos;, &apos;DESeq&apos;, &apos;QN&apos;, &apos;qsmooth&apos;, &apos;none&apos;)) &#123;</span><br><span class="line">  suppressPackageStartupMessages(&#123;</span><br><span class="line">    library(edgeR)</span><br><span class="line">    library(doParallel)</span><br><span class="line">    library(preprocessCore)</span><br><span class="line">    library(DESeq2)</span><br><span class="line">    library(qsmooth)</span><br><span class="line">  &#125;)</span><br><span class="line">  registerDoParallel()</span><br><span class="line">  if (tissues == &apos;SMTSD&apos;) tissues &lt;- factor(pData(eset)[, &apos;SMTSD&apos;])</span><br><span class="line"></span><br><span class="line">  if (method == &apos;TMM&apos;) &#123;</span><br><span class="line">    # weights are from the delta method on Binomial data</span><br><span class="line">    normalizedMatrix &lt;- foreach(tissue = unique(tissues), .combine = cbind) %dopar% &#123;</span><br><span class="line">      cnts &lt;- exprs(eset[, which(pData(eset)$SMTSD %in% tissue)])</span><br><span class="line">      dge &lt;- DGEList(cnts)</span><br><span class="line">      dge &lt;- calcNormFactors(dge, method = &apos;TMM&apos;)</span><br><span class="line">      cpm(dge, log = T, prior.count = 1)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else if (method == &apos;RLE&apos;) &#123;</span><br><span class="line">    # the median ratio of each sample to the median library (geometric mean of all columns) is taken as the scale factor</span><br><span class="line">    normalizedMatrix &lt;- foreach(tissue = unique(tissues), .combine = cbind) %dopar% &#123;</span><br><span class="line">      cnts &lt;- exprs(eset[, which(pData(eset)$SMTSD %in% tissue)])</span><br><span class="line">      dge &lt;- DGEList(cnts)</span><br><span class="line">      dge &lt;- calcNormFactors(dge, method = &apos;RLE&apos;)</span><br><span class="line">      cpm(dge, log = T, prior.count = 1)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else if (method == &apos;UQ&apos;) &#123;</span><br><span class="line">    # the scale factors are calculated from the 75% quantile of the counts for each library</span><br><span class="line">    normalizedMatrix &lt;- foreach(tissue = unique(tissues), .combine = cbind) %dopar% &#123;</span><br><span class="line">      cnts &lt;- exprs(eset[, which(pData(eset)$SMTSD %in% tissue)])</span><br><span class="line">      dge &lt;- DGEList(cnts)</span><br><span class="line">      dge &lt;- calcNormFactors(dge, method = &apos;upperquartile&apos;)</span><br><span class="line">      cpm(dge, log = T, prior.count = 1)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else if (method == &apos;none&apos;) &#123;</span><br><span class="line">    # scale factors are 1</span><br><span class="line">    normalizedMatrix &lt;- foreach(tissue = unique(tissues), .combine = cbind) %dopar% &#123;</span><br><span class="line">      cnts &lt;- exprs(eset[, which(pData(eset)$SMTSD %in% tissue)])</span><br><span class="line">      dge &lt;- DGEList(cnts)</span><br><span class="line">      dge &lt;- calcNormFactors(dge, method = &apos;none&apos;)</span><br><span class="line">      cpm(dge, log = T, prior.count = 1)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else if (method == &apos;DESeq&apos;) &#123;</span><br><span class="line">    # counts divided by median ratio of gene counts relative to geometric mean per gene</span><br><span class="line">    normalizedMatrix &lt;- foreach(tissue = unique(tissues), .combine = cbind) %dopar% &#123;</span><br><span class="line">      cnts &lt;- exprs(eset[, which(pData(eset)$SMTSD %in% tissue)])</span><br><span class="line">      dds &lt;- DESeqDataSetFromMatrix(countData = cnts, colData = pData(eset[, which(pData(eset)$SMTSD %in% tissue)]), design = ~ 1)</span><br><span class="line">      dds &lt;- estimateSizeFactors(dds)</span><br><span class="line">      nmat &lt;- counts(dds, normalized=T)</span><br><span class="line">      cpm(nmat, log = T, prior.count = 1)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else if (method == &apos;QN&apos;) &#123;</span><br><span class="line">    normalizedMatrix &lt;- foreach(tissue = unique(tissues), .combine = cbind) %dopar% &#123;</span><br><span class="line">      cnts &lt;- exprs(eset[, which(pData(eset)$SMTSD %in% tissue)])</span><br><span class="line">      nmat &lt;- normalize.quantiles(cnts, copy=F)</span><br><span class="line">      cpm(nmat, log = T, prior.count = 1)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; else if (method == &apos;qsmooth&apos;) &#123;</span><br><span class="line">    exprs &lt;- exprs(eset)</span><br><span class="line">    qs &lt;- qsmooth(exprs, group_factor = tissues)</span><br><span class="line">    normalizedMatrix &lt;- qsmoothData(qs)</span><br><span class="line">    normalizedMatrix &lt;- cpm(normalizedMatrix, log = T, prior.count = 1)</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    stop(&apos;YEEEE... code it by yourself if you wanna do it.&apos;)</span><br><span class="line">  &#125;</span><br><span class="line">  normalizedMatrix</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Visualize-distributions"><a href="#Visualize-distributions" class="headerlink" title="Visualize distributions"></a>Visualize distributions</h2><p>I chose some tissues to see their distribution.</p>
+<p>Some helper functions:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">getColors &lt;- function(vec) &#123;</span><br><span class="line">  # assgin a color to each group of samples</span><br><span class="line">  library(RColorBrewer)</span><br><span class="line">  n &lt;- length(unique(vec))</span><br><span class="line">  col &lt;- brewer.pal(n, &quot;Paired&quot;)</span><br><span class="line">  #col &lt;- brewer.pal.info[brewer.pal.info$category==&apos;qual&apos;, ] # get max. 74 colours</span><br><span class="line">  #col_all &lt;- unlist(mapply(brewer.pal, col$maxcolors, rownames(col)))</span><br><span class="line">  ifelse (n &gt; length(col),</span><br><span class="line">          cvec &lt;- sample(col, n, replace=T),</span><br><span class="line">          cvec &lt;- sample(col, n, replace=F)</span><br><span class="line">  )</span><br><span class="line">  vec &lt;- as.character(vec)</span><br><span class="line">  names(vec) &lt;- rep(NA, length(vec))</span><br><span class="line">  for (g in 1:length(unique(vec))) &#123;</span><br><span class="line">    names(vec)[which(vec==unique(vec)[g])] &lt;- cvec[g]</span><br><span class="line">  &#125;</span><br><span class="line">  vec</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dens.plot &lt;- function(table, colVec, ylim, main) &#123;</span><br><span class="line">  cols &lt;- names(colVec)</span><br><span class="line">  d &lt;- plot(density(table[, 1]), col=cols[1],</span><br><span class="line">            lwd=2, las=2, ylim=ylim, main=&quot;&quot;, xlab=&quot;&quot;) +</span><br><span class="line">    abline(v=0, lty=3) + title(xlab=&quot;log2(CPM + 1)&quot;, ylab=NA, main=main) +</span><br><span class="line">    for (i in 2:ncol(table)) &#123;</span><br><span class="line">      den &lt;- density(table[, i])</span><br><span class="line">      lines(den$x, den$y, col=cols[i], lwd=2)</span><br><span class="line">    &#125;</span><br><span class="line">  legend(&apos;topright&apos;, legend=unique(colVector), lty=1, col=unique(names(colVector)), cex=0.6)</span><br><span class="line">  d</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Present the distributions:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">selectt &lt;- c(&apos;Brain - Amygdala&apos;, &apos;Artery - Aorta&apos;, &apos;Heart - Atrial Appendage&apos;, &apos;Whole Blood&apos;, &apos;Testis&apos;)</span><br><span class="line">sub.eset &lt;- eset[, which(pData(eset)$SMTSD %in% selectt)]</span><br><span class="line">dim(sub.eset)</span><br><span class="line"></span><br><span class="line">dist.list &lt;- list()</span><br><span class="line">for (n in c(&apos;TMM&apos;, &apos;RLE&apos;, &apos;UQ&apos;, &apos;DESeq&apos;, &apos;QN&apos;, &apos;qsmooth&apos;, &apos;none&apos;)) &#123;</span><br><span class="line">  dist.list[[n]] &lt;- tissue.aware.norm(sub.eset, &quot;SMTSD&quot;, n)</span><br><span class="line">&#125;</span><br><span class="line">saveRDS(dist.list, file=&apos;~/cvd/v8/exprs/norm.cpm.rds&apos;)</span><br><span class="line"></span><br><span class="line">sub.p &lt;- pData(sub.eset)</span><br><span class="line">sub.p$SMTSD &lt;- factor(sub.p$SMTSD)</span><br><span class="line">sub.p &lt;- sub.p[order(sub.p$SMTSD),]</span><br><span class="line">colVector &lt;- getColors(sub.p$SMTSD)</span><br><span class="line"></span><br><span class="line">mypar(3, 3)</span><br><span class="line">for (n in c(&apos;TMM&apos;, &apos;RLE&apos;, &apos;UQ&apos;, &apos;DESeq&apos;, &apos;QN&apos;, &apos;qsmooth&apos;, &apos;none&apos;)) &#123;</span><br><span class="line">  print(dens.plot(dist.list[[n]][,match(rownames(sub.p), colnames(dist.list[[n]]))], colVector, c(0, 0.3), title=n))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/images/posts/RNA-norm/distributions.png" alt="distributions" width="1000">
+
+<p>I don’t know why there are still many lowly-expressed genes in whole blood and atrial appendage samples, others look good though. The first three - TMM, RLE, UQ - are quite similar; DESeq method seems the same as none… I don’t know how to determine which is better for QN and qsmooth, I need to clarify the maths first… QAQ</p>
+<p>Oh today is Christmas! Merry Xmas!!</p>
+<pre><code>      *             ,
+                  _/^\_
+                 &lt;     &gt;
+*                 /.-.\         *
+         *        `/&amp;\`                   *
+                 ,@.*;@,
+                /_o.I %_\    *
+   *           (`&apos;--:o(_@;
+              /`;--.,__ `&apos;)             *
+             ;@`o % O,*`&apos;`&amp;\
+       *    (`&apos;--)_@ ;o %&apos;()\      *
+            /`;--._`&apos;&apos;--._O&apos;@;
+           /&amp;*,()~o`;-.,_ `&quot;&quot;`)
+*          /`,@ ;+&amp; () o*`;-&apos;;\
+          (`&quot;&quot;--.,_0 +% @&apos; &amp;()\
+          /-.,_    ``&apos;&apos;--....-&apos;`)  *
+     *    /@%;o`:;&apos;--,.__   __.&apos;\
+         ;*,&amp;(); @ % &amp;^;~`&quot;`o;@();         *
+         /(); o^~; &amp; ().o@*&amp;`;&amp;%O\
+         `&quot;=&quot;==&quot;&quot;==,,,.,=&quot;==&quot;===&quot;`
+      __.----.(\-&apos;&apos;#####---...___...-----._
+    &apos;`         \)_`&quot;&quot;&quot;&quot;&quot;`
+            .--&apos; &apos;)
+          o(  )_-\
+            `&quot;&quot;&quot;` `</code></pre>
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+    <div class="friends-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Blog</a></li>
+         
+          <li><a href="/projects/">Projects</a></li>
+         
+          <li><a href="/friends/">Friends</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Filter-Genes"><span class="toc-number">1.</span> <span class="toc-text">Filter Genes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Compare-Normalization"><span class="toc-number">2.</span> <span class="toc-text">Compare Normalization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Visualize-distributions"><span class="toc-number">3.</span> <span class="toc-text">Visualize distributions</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&text=Implementations of normalization methods for RNA-seq"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&is_video=false&description=Implementations of normalization methods for RNA-seq"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Implementations of normalization methods for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&name=Implementations of normalization methods for RNA-seq&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2019 Chilam
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Blog</a></li>
+         
+          <li><a href="/projects/">Projects</a></li>
+         
+          <li><a href="/friends/">Friends</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'darklings';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
+</body>
+</html>
