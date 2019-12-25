@@ -15,7 +15,7 @@
 <meta property="og:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/distributions.png">
-<meta property="og:updated_time" content="2019-12-25T09:32:37.601Z">
+<meta property="og:updated_time" content="2019-12-25T09:37:41.585Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Implementations of normalization methods for RNA-seq">
 <meta name="twitter:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
@@ -149,7 +149,7 @@
   
 
   <div class="content" itemprop="articleBody">
-    <p>In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: <a href="2019/12/17/RNA-norm/index.html">Normalization methods for RNA-seq</a>.</p>
+    <p>In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: <a href="https://chilampoon.github.io/2019/12/17/RNA-norm/" target="_blank" rel="noopener">Normalization methods for RNA-seq</a>.</p>
 <p>Actually I was suggested to compare all these methods before doing DE analylsis by Joey, my advisor :P, I thought just using qsmooth was OK, but we finally ended up with tissue-aware quantile normalization.</p>
 <h2 id="Filter-Genes"><a href="#Filter-Genes" class="headerlink" title="Filter Genes"></a>Filter Genes</h2><p>I am manipulating GTEx v8 data, I first filtered lowly-expressed genes after some prepossesses:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">library(edgeR)</span><br><span class="line">tissue.no &lt;- pData(eset) %&gt;%</span><br><span class="line">             group_by(SMTSD) %&gt;%</span><br><span class="line">             summarise(n=n())</span><br><span class="line"></span><br><span class="line"># in tissue-aware manner, refer to YARN paper</span><br><span class="line">min(tissue.no$n) #113</span><br><span class="line">minSamples &lt;- floor(min(tissue.no$n)/2)</span><br><span class="line">cnt.cpm &lt;- cpm(exprs(eset))</span><br><span class="line">keep &lt;- rowSums(cnt.cpm &gt; 1) &gt;= minSamples</span><br><span class="line">eset &lt;- eset[keep,]</span><br><span class="line">dim(eset)</span><br><span class="line">## Features  Samples</span><br><span class="line">##    29212    14437</span><br></pre></td></tr></table></figure>
