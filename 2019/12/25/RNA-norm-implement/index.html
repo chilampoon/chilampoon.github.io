@@ -9,15 +9,15 @@
     <meta name="description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
 <meta name="keywords" content="RNA-seq,Normalization">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Implementations of normalization methods for RNA-seq">
+<meta property="og:title" content="Implementations of tissue-aware normalization for RNA-seq">
 <meta property="og:url" content="http://yoursite.com/2019/12/25/RNA-norm-implement/index.html">
 <meta property="og:site_name" content="Chi Lam Poon">
 <meta property="og:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/distributions.png">
-<meta property="og:updated_time" content="2019-12-26T06:50:05.681Z">
+<meta property="og:updated_time" content="2019-12-26T07:08:45.550Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Implementations of normalization methods for RNA-seq">
+<meta name="twitter:title" content="Implementations of tissue-aware normalization for RNA-seq">
 <meta name="twitter:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
 <meta name="twitter:image" content="http://yoursite.com/images/posts/RNA-norm/distributions.png">
     
@@ -39,7 +39,7 @@
         
     
     <!-- title -->
-    <title>Implementations of normalization methods for RNA-seq</title>
+    <title>Implementations of tissue-aware normalization for RNA-seq</title>
     <!-- styles -->
     <link rel="stylesheet" href="/css/style.css">
     <!-- persian styles -->
@@ -92,15 +92,15 @@
     <div id="share" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&text=Implementations of normalization methods for RNA-seq"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&is_video=false&description=Implementations of normalization methods for RNA-seq"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Implementations of normalization methods for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&name=Implementations of normalization methods for RNA-seq&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&text=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&is_video=false&description=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Implementations of tissue-aware normalization for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&name=Implementations of tissue-aware normalization for RNA-seq&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -117,7 +117,7 @@
   <header>
     
     <h1 class="posttitle" itemprop="name headline">
-        Implementations of normalization methods for RNA-seq
+        Implementations of tissue-aware normalization for RNA-seq
     </h1>
 
 
@@ -247,15 +247,15 @@
     <div id="share-footer" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&text=Implementations of normalization methods for RNA-seq"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&is_video=false&description=Implementations of normalization methods for RNA-seq"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Implementations of normalization methods for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of normalization methods for RNA-seq"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&name=Implementations of normalization methods for RNA-seq&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&text=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&is_video=false&description=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Implementations of tissue-aware normalization for RNA-seq&body=Check out this article: http://yoursite.com/2019/12/25/RNA-norm-implement/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&title=Implementations of tissue-aware normalization for RNA-seq"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2019/12/25/RNA-norm-implement/&name=Implementations of tissue-aware normalization for RNA-seq&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
