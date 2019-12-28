@@ -15,7 +15,7 @@
 <meta property="og:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http://yoursite.com/images/posts/RNA-norm/distributions.png">
-<meta property="og:updated_time" content="2019-12-28T08:57:42.024Z">
+<meta property="og:updated_time" content="2019-12-28T09:06:01.501Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Implementations of tissue-aware normalization for RNA-seq">
 <meta name="twitter:description" content="In this post I’ll show some GTEx expresssion data using the normalization methods introduced in my last post: Normalization methods for RNA-seq. Actually I was suggested to compare all these methods b">
@@ -176,7 +176,7 @@
 
 <img src="/images/posts/RNA-norm/distributions.png" alt="distributions" width="1000">
 
-<p>I don’t know why there are still many lowly-expressed genes in some of these samples, testis looks good though. The first three - TMM, RLE, UQ - are quite similar; DESeq method seems the same as none… I don’t know how to determine which is better for QN and qsmooth, I need to clarify the maths first… QAQ</p>
+<p>I don’t know why there are still many lowly-expressed genes in some of these tissues, testis looks good though. The first three - TMM, RLE, UQ - are quite similar; DESeq method seems the same as none… I don’t know how to determine which is better for QN and qsmooth, I need to clarify the maths first… QAQ</p>
 <h3 id="Discussion-of-QN-and-qsmooth"><a href="#Discussion-of-QN-and-qsmooth" class="headerlink" title="Discussion of QN and qsmooth"></a>Discussion of QN and qsmooth</h3><p>I have been confused about the differences between doing qsmooth for the whole dataset and doing quantile normalization in each tissue (tissue-aware QN) since I read the YARN and qsmooth paper. In the qsmooth paper, the authors stated that advantages of qsmooth include:</p>
 <ol>
 <li>preservation of global differences in distributions corresponding to different biological conditions</li>
@@ -185,7 +185,6 @@
 <li>the return of normalized data that can be used for many types of downstream analyses</li>
 </ol>
 <p>For the first and second ones, I think these are related to the weights assigned to each quantile when doing qsmooth, so the tissue-aware quantile normalization cannot keep global differences? Then how to explain this difference (from my plots for example..)?</p>
-<p>Oh today is Christmas! Merry Xmas!!</p>
 <pre><code>      *             ,
                   _/^\_
                  &lt;     &gt;
@@ -196,7 +195,7 @@
    *           (`&apos;--:o(_@;
               /`;--.,__ `&apos;)             *
              ;@`o % O,*`&apos;`&amp;\
-       *    (`&apos;--)_@ ;o %&apos;()\      *
+       *    (`&apos;--)_@ ;o %&apos;()\      *      Oh today is Christmas! Merry Xmas!!
             /`;--._`&apos;&apos;--._O&apos;@;
            /&amp;*,()~o`;-.,_ `&quot;&quot;`)
 *          /`,@ ;+&amp; () o*`;-&apos;;\
