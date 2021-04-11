@@ -9,16 +9,8 @@
 
 
     <url>
-        <loc>https://chilampoon.github.io/2019/RNA-norm.html</loc>
-        <lastmod>2021-04-11T03:16:57.548Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://chilampoon.github.io/2019/RNA-norm-implement.html</loc>
-        <lastmod>2020-01-09T09:11:10.000Z</lastmod>
+        <lastmod>2021-04-11T04:19:27.735Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -26,7 +18,15 @@
 
     <url>
         <loc>https://chilampoon.github.io/2019/rhythmicity-detection-tools.html</loc>
-        <lastmod>2019-12-31T07:00:53.000Z</lastmod>
+        <lastmod>2021-04-11T04:17:17.431Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://chilampoon.github.io/2019/RNA-norm.html</loc>
+        <lastmod>2021-04-11T03:16:57.548Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
