@@ -12,7 +12,7 @@
 
 
 
-<title>Basics of Bootstrapping | Chi Lam Poon</title>
+<title>Tools for rhythmicity detection | Chi Lam Poon</title>
 
 
 
@@ -33,8 +33,6 @@
     <script src="/js/script.js"></script>
     
     <script src="/js/tocbot.min.js"></script>
-    
-    <script src="/lib/jquery/jquery.min.js"></script>
     
 
 
@@ -175,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Basics of Bootstrapping</h1>
+            <h1 class="post-title">Tools for rhythmicity detection</h1>
             
                 <div class="post-meta">
                     
@@ -184,7 +182,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">July 8, 2019&nbsp;&nbsp;9:09:11</a>
+                        Date: <a href="#">December 31, 2019&nbsp;&nbsp;12:33:35</a>
                         </span>
                     
                     
@@ -193,28 +191,86 @@
         </header>
 
         <div class="post-content">
-            <h2 id="What-Is-Bootstrapping"><a href="#What-Is-Bootstrapping" class="headerlink" title="What Is Bootstrapping"></a>What Is Bootstrapping</h2><p><em>Note that bootstrapping has different meanings in computing and statistics.</em></p>
-<p>Bootstrapping is actually <strong>resampling with replacement</strong>.</p>
-<p>Here is a simple example. We begin with a statistical sample from a population that we know nothing about. Our goal will be a 90% confidence interval about the mean of the sample.</p>
-<p>The sample data I have is 3, 5, 7, 18, 10, then we could generate bootstrap samples like:</p>
-<ul>
-<li>7, 3, 3, 10, 5</li>
-<li>18, 18, 10, 3, 7</li>
-<li>3, 10, 7, 5, 10</li>
-<li>3, 3, 18, 7, 5</li>
-<li>5, 7, 7, 7, 10</li>
-<li>10, 3, 7, 10, 18</li>
-<li>…</li>
-</ul>
-<p>Now that we have these samples, the means of our bootstrap samples can be calculated. Finally, we can estimate the confidence interval (95th and 5th percentiles) of our population mean.</p>
-<p>To sum up, through bootstrapping you are simply taking samples over and over again from the same group of data (your sample data) to provide an estimate of the sampling distribution of the sample statistic in question, rather than provide an estimate of the population distribution – we take our sample itself as a model of the population.</p>
-<h2 id="When-Could-Use-Bootstrapping"><a href="#When-Could-Use-Bootstrapping" class="headerlink" title="When Could Use Bootstrapping"></a>When Could Use Bootstrapping</h2><p> It is especially useful when the sample size that we are working with is small. Under usual circumstances, sample sizes of less than 40 (30?) cannot be dealt with by assuming a <em>normal distribution</em> or a <em>t distribution</em>. Bootstrap techniques work quite well with samples that have less than 40 elements. The reason for this is that bootstrapping involves resampling. These kinds of techniques <strong>assume nothing</strong> about the distribution of our data.</p>
-<h2 id="Real-Example"><a href="#Real-Example" class="headerlink" title="Real Example"></a>Real Example</h2><h3 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h3><ol>
-<li><p><a target="_blank" rel="noopener" href="https://www.thoughtco.com/example-of-bootstrapping-3126155">ThoughtCo - Example of Bootstrapping</a></p>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://stats.stackexchange.com/questions/26088/explaining-to-laypeople-why-bootstrapping-works">StackExchange - Explaining to laypeople why bootstrapping works</a></p>
-</li>
-</ol>
+            <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>In early years, some tools can only detect rhythmicity, i.e. to tell you whether this gene or transcript or protein had a cycling expression, and they cannot tell you whether the feature you tested had different amplitudes, phases, etc. in different conditions. Thus, some tools were later created for doing that and they called this process <strong>differential rhythmicity</strong>.</p>
+<p>There are two main types of methods, parametric and nonparametric. The difference between these two is just whether based on a known mathematical model or not.</p>
+<p>Parametric methods are able to detect weaker rhythms than nonparametric methods. However, parametric methods rely on stricter assumptions: usually, measurement errors must have Gaussian distributions, and the methods are sensible to outliers.</p>
+<p>Nonparametric methods sacrifice some degree of power in order to gain robustness against outliers, and they make fewer assumptions about measurement errors.</p>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><h4 id="Rhythmicity-Detection"><a href="#Rhythmicity-Detection" class="headerlink" title="Rhythmicity Detection"></a>Rhythmicity Detection</h4><table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Method</th>
+            <th>Year</th>
+            <th>Notes</th>
+            <th>Others</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan=3>Parametric</td>
+            <td>Fisher’s G test</td>
+            <td>2004</td>
+            <td>Exact test with g-statistics</td>
+            <td rowspan=3>Fourier analysis</td>
+        </tr>
+        <tr>
+            <td>Sinusoidal regression</td>
+            <td>2013</td>
+            <td>Curve fitting</td>
+        </tr>
+        <tr>
+            <td>Cosinor regression</td>
+            <td>2014</td>
+            <td>Curve fitting</td>
+        </tr>
+        <tr>
+            <td rowspan=2>Nonparametric</td>
+            <td>JTK_CYCLE</td>
+            <td>2010</td>
+            <td>JT test + Kendall's tau correlations</td>
+            <td>Symmetric rhythms only</td>
+        </tr>
+        <tr>
+            <td>RAIN</td>
+            <td>2014</td>
+            <td>Extend JTK to include asymmetric rhythms</td>
+            <td> </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<h4 id="Differential-Rhythmicity"><a href="#Differential-Rhythmicity" class="headerlink" title="Differential Rhythmicity"></a>Differential Rhythmicity</h4><table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Method</th>
+            <th>Year</th>
+            <th>Notes</th>
+            <th>Others</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Parametric</td>
+            <td>DODR</td>
+            <td>2016</td>
+            <td>Detects changes in periodic paramters</td>
+            <td>2 conditions only</td>
+        </tr>
+        <tr>
+            <td>Nonparametric</td>
+            <td>LimoRhyde</td>
+            <td>2018</td>
+            <td>Combination of cosinor regression and limma</td>
+            <td>Allows multiple experimental variables</td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+<h2 id="Details"><a href="#Details" class="headerlink" title="Details"></a>Details</h2><p>Appear soon!</p>
 
         </div>
 
@@ -233,9 +289,9 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/Statistics/"># Statistics</a>
+                        <a href="/tags/RNA-seq/"># RNA-seq</a>
                     
-                        <a href="/tags/Machine-Learning/"># Machine Learning</a>
+                        <a href="/tags/Circadian-rhythm/"># Circadian rhythm</a>
                     
                         
                 </span>
@@ -248,8 +304,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2019/A-lunch-conversation.html">A lunch conversation</a>
             
+            <a class="next" rel="next" href="/2019/RNA-norm-implement/">Implementations of tissue-aware normalization for RNA-seq</a>
             
         </section>
 
