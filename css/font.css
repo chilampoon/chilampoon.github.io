@@ -1,6 +1,12 @@
 @font-face {
-  font-family: 'libertine';
-  src: url("../fonts/libertine/LinLibertine_R.ttf") format('truetype');
+  font-family: 'lora';
+  src: url("../fonts/lora/Lora-VariableFont_wght.ttf") format('truetype');
   font-weight: 430;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'libertine';
+  src: url("../fonts/libertine/LinLibertine_R.otf") format('opentype');
+  font-weight: 450;
   font-display: swap;
 }
