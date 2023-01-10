@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="chilampoon">
+
+
+
+
+
+<title>Beta-binomial empirical Bayesian modeling | Hexo</title>
+
+
+
+    <link rel="icon" href="/image/kitty.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Waking up</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Waking up</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Beta-binomial empirical Bayesian modeling</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">chilampoon</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 9, 2023&nbsp;&nbsp;20:30:35</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="Beta-binomial-model"><a href="#Beta-binomial-model" class="headerlink" title="Beta-binomial model"></a>Beta-binomial model</h2><p>Suppose we observed $n$ reads covering a mismatch position $i$, of which $m$ reads harbor an allele that is considered mutated. Mutation rate $\theta_{i}$ follows a beta distribution.</p>
+<p>$$\begin{split}<br>m_{i} &amp;\sim \text{Binom}(n_{i}, \theta_{i}) \\<br>\theta_{i} &amp;\sim \text{Beta}(\alpha_{i}, \beta_{i})<br>\end{split}$$</p>
+<p>We know </p>
+<p>$$<br>\theta \sim \text{Beta}(\alpha, \beta) &#x3D; \text{Beta}(\theta|\alpha, \beta) &#x3D; \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{\text{B}(\alpha, \beta)}<br>$$</p>
+<p>$$\begin{split}<br>\mathrm{B}(\alpha, \beta) &amp;&#x3D; \int_0^1 t^{\alpha-1} (1-t)^{\beta-1} dt \; \; \text{(integral definition)} \\<br>\mathrm{B}(\alpha, \beta) &amp;&#x3D; \frac{\Gamma(\alpha) \Gamma(\beta)}{\Gamma(\alpha+\beta)} \; \; \text{(relationship to gamma function)}<br>\end{split}$$</p>
+<p>we can marginalize out latent variable $\theta_{i}$, and the probability of having $m_i$ given $n_i, \alpha, \beta$ becomes:</p>
+<p>$$\begin{split}<br>P(m_i|n_i,\alpha_i,\beta_i) &amp; &#x3D; \int_{0}^{1} \text{Binom}(m_i|n_i,\theta_i) , \text{Beta}(\theta_i|\alpha_i,\beta_i) \, d\theta_i \\<br>&amp; &#x3D; \int_0^1 \binom{n_i}{m_i}\theta_{i}^{m_i}(1-\theta_i)^{n_i-m_i} \, \frac{1}{\text{B}(\alpha_i, \beta_i)} \theta_i^{\alpha_{i}-1}(1-\theta_i)^{\beta_{i}-1} \, d\theta_i \\<br>&amp; &#x3D; \binom{n_i}{m_i} \int_0^1  \theta_{i}^{m_i+\alpha_{i}-1}(1-\theta_i)^{n_i-m_i+\beta_{i}-1} \, d\theta_i \, \frac{1}{\text{B}(\alpha_{i}, \beta_{i})} \\<br>&amp; &#x3D; \binom{n_i}{m_i} \frac{\text{B}(m_i+\alpha_{i}, n_i-m_i+\beta_{i})}{\text{B}(\alpha_{i}, \beta_{i})}<br>\end{split}$$</p>
+<p>where  $\alpha_i$ and $\beta_i$ are hyperparamters in beta function $\mathrm{B}()$.</p>
+<h3 id="Reparameterization"><a href="#Reparameterization" class="headerlink" title="Reparameterization"></a>Reparameterization</h3><p>We can also reparameterize $\alpha$ and $\beta$ to $\mu$ and $\rho$:</p>
+<p>$$\begin{split}<br>\mu &#x3D; \frac{\alpha}{\alpha+\beta}; &amp; \; \rho &#x3D; \frac{1}{\alpha+\beta+1} \\<br>\alpha &#x3D; \frac{\mu(1-\rho)}{\rho}; &amp; \; \beta &#x3D; \frac{(1-\mu)(1-\rho)}{\rho}<br>\end{split}$$</p>
+<p>where $\mu$ corresponds to the estimation of $\theta$, $\rho$ corresponds to the extent of overdispersion. </p>
+<p>The expectation and variance of the beta-binomial distribution:<br>$$<br>\mathbb{E}(m|n,\mu,\rho)&#x3D;n\mu; \; \; \text{Var}(m|n,\mu,\rho) &#x3D; n\mu(1-\mu)[1+(n-1)\rho]<br>$$</p>
+<h2 id="Maximum-likelihood-estimation-frequentist"><a href="#Maximum-likelihood-estimation-frequentist" class="headerlink" title="Maximum likelihood estimation (frequentist)"></a>Maximum likelihood estimation (frequentist)</h2><p>We can estimate $\alpha_{i}$ and $\beta_{i}$ by <strong>maximum likelihood estimation (MLE)</strong>, the likelihood function is:</p>
+<p>$$<br>\ell(\alpha_{i},\beta_{i}) &#x3D; \prod_{i&#x3D;1}^{I} P(m_{i}|\alpha_{i},\beta_{i}) &#x3D; \prod_{i&#x3D;1}^{I} \binom{n_{i}}{m_{i}} \frac{\text{B}(m_{i}+\alpha_{i}, n_{i}-m_{i}+\beta_{i})}{\text{B}(\alpha_{i}, \beta_{i})}<br>$$</p>
+<p>After reparameterization:</p>
+<p>$$<br>\ell(\mu_{i},\rho_{i}) &#x3D; \prod_{i&#x3D;1}^{I} P(m_{i}|\mu_{i},\rho_{i}) &#x3D; \prod_{i&#x3D;1}^{I} \binom{n_{i}}{m_{i}} \frac{\mathrm{B}(m_{i}+\frac{\mu_{i}(1-\rho_{i})}{\rho_{i}}, n_{i}-m_{i}+\frac{(1-\mu_{i})(1-\rho_{i})}{\rho_{i}})}{\mathrm{B}(\frac{\mu_{i}(1-\rho_{i})}{\rho_{i}}, \frac{(1-\mu_{i})(1-\rho_{i})}{\rho_{i}})}<br>$$</p>
+<p>We could get the point estimation by taking the derivative of pdf and set to 0:</p>
+<p>$$\begin{split}<br>\nabla_{\theta_{i}} P(m_{i}|\theta_{i}) &amp;&#x3D; \frac{dP(m_{i}|\theta_{i})}{d\theta_{i}} \binom{n_{i}}{m_{i}} \theta_{i}^{m_{i}}(1-\theta_{i})^{n_{i}-m_{i}} \\<br>&amp;&#x3D; m_{i}\theta_{i}^{m_{i}-1}(1-\theta_{i})^{n_{i}-m_{i}} + \theta_{i}^{m_{i}}(m_{i}-n_{i})(1-\theta_{i})^{n_{i}-m_{i}-1}\<br>&amp;&#x3D;0 \\ \\<br>\hat{\theta_{i}}^{MLE} &amp;&#x3D; \frac{m_{i}}{n_{i}}<br>\end{split}$$</p>
+<h2 id="Bayesian-estimation"><a href="#Bayesian-estimation" class="headerlink" title="Bayesian estimation"></a>Bayesian estimation</h2><p>First derive the posterior distribution for $\theta_i$:</p>
+<p>$$\begin{split}<br>P(\theta_i|m_i) &amp; &#x3D; \frac{P(m_i|\theta_i)P(\theta_i)}{P(m_i)} &#x3D; \frac{P(m_i|\theta_i)P(\theta_i)}{\int_{0}^{1} P(m_i|\theta_i)P(\theta_i)d\theta_i} \\<br>&amp;&#x3D; \frac{\binom{n_i}{m_i}\theta_{i}^{m_{i}+\alpha_{i}-1} (1-\theta_i)^{n_{i}-m_{i}+\beta_{i}-1}&#x2F;\mathrm{B}(\alpha_{i},\beta_{i})}{\int_0^1\left(\binom{n_{i}}{m_{i}}\theta_{i}^{m_{i}+\alpha_{i}-1}(1-\theta_{i})^{n_{i}-m_{i}+\beta_{i}-1}\right)d\theta_{i}&#x2F;\mathrm{B}(\alpha_{i},\beta_{i})} \\<br>&amp; &#x3D; \frac{\binom{n_{i}}{m_{i}}\theta_{i}^{m_{i}+\alpha_{i}-1} (1-\theta_{i})^{n_{i}-m_{i}+\beta_{i}-1}}{\mathrm{B}(m_{i}+\alpha_{i},n_{i}-m_{i}+\beta_{i})}<br>\end{split}$$</p>
+<p>where $P(m_{i})$ is the marginal distribution of $m_{i}$, the joint density $P(\theta_{i}, m_{i})$ with $\theta_{i}$ integrated out. It can also be viewed as $P(\theta_{i}|m_{i}) \propto P(\theta_{i}) P(m_{i}|\theta_{i})$ .</p>
+<p>To calculate the point estimator of <strong>Maximizing A Posterior (MAP)</strong>, take the gradient of the probability density function and set to 0:</p>
+<p>$$\begin{split}<br>\nabla_{\theta_{i}} P(\theta_{i}|m_{i}) &amp;&#x3D; \frac{dP(\theta_{i}|m_{i})}{d\theta_{i}} \binom{n_{i}}{m_{i}} \theta_{i}^{m_{i}+\alpha_{i}-1} (1-\theta_{i})^{n_{i}-m_{i}+\beta_{i}-1} \\<br>&amp;&#x3D; \theta_{i}^{m_{i}+\alpha_{i}-1}(1-\theta_{i})^{n_{i}-m_{i}+\beta_{i}-1}((m+\alpha_{i}-1)\theta_{i}^{-1}+(-n_{i}+m_{i}-\beta_{i}+1)(1-\theta_{i})^{n_{i}-m_{i}+\beta_{i}-2}) \\<br>&amp;&#x3D; 0 \\ \\<br>\hat{\theta_{i}}^{MAP} &amp;&#x3D; \frac{m_{i}+\alpha_{i}-1}{n_{i}+\alpha_{i}+\beta_{i}-2}<br>\end{split}$$</p>
+<p>For Bayesian inference, we first get:</p>
+<p>$$<br>\hat{\theta_{i}} \sim \mathrm{Beta}(m_{i}+\alpha_{i}, n_{i}-m_{i}+\beta_{i}) &#x3D; \mathrm{Beta}(\hat{\theta_{i}}|m_{i}+\alpha_{i}, n_{i}-m_{i}+\beta_{i})<br>$$</p>
+<p>Note that the expected value of a beta random variable is:</p>
+<p>$$\begin{split}<br>\mathbb{E}[\theta] &amp; &#x3D; \int_{-\infty}^{\infty} \theta f_{\theta}(\theta)d\theta &#x3D; \int_0^1 \theta \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{\mathrm{B}(\alpha,\beta)}d\theta \\<br>&amp; &#x3D; \int_0^1 \theta^{\alpha}(1-\theta)^{\beta-1}d\theta \frac{1}{\mathrm{B}(\alpha,\beta)} \\<br>&amp;&#x3D; \frac{\mathrm{B}(\alpha+1,\beta)}{\mathrm{B}(\alpha, \beta)} \;\; \text{(rewrite beta function in gamma function)} \\<br>&amp; &#x3D; \frac{\Gamma(\alpha+1)\Gamma(\beta)&#x2F;\Gamma(\alpha+\beta+1)}{\Gamma(\alpha)\Gamma(\beta)&#x2F;\Gamma(\alpha+\beta)} \\<br>&amp; &#x3D; \frac{\Gamma(\alpha+1)\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\alpha+\beta+1)} \;\; (\text{by definition} \;\; \Gamma(n) &#x3D; (n-1)!) \\<br>&amp; &#x3D; \frac{\alpha}{\alpha+\beta}<br>\end{split}$$</p>
+<p>the variance is:</p>
+<p>$$\begin{split}<br>\mathrm{Var}(\theta) &amp; &#x3D; \mathbb{E}[\theta^2] - \mathbb{E}[\theta]^2 \\<br>&amp;&#x3D; \frac{(\alpha+1)\alpha}{(\alpha+\beta+1)(\alpha+\beta)} - \frac{\alpha^2}{(\alpha+\beta)^2} \\<br>&amp;&#x3D; \frac{\alpha\beta}{(\alpha+\beta+1)(\alpha+\beta)^2}<br>\end{split}$$</p>
+<p>then we know the posterior expected value and posterior variance:<br>$$<br>\mathbb{E}(\hat{\theta_{i}}) &#x3D; \frac{m_{i}+\alpha_{i}}{n_{i}+\alpha_{i}+\beta_{i}}\;, \; \mathrm{Var}(\hat{\theta_{i}}) &#x3D; \frac{(m_{i}+\alpha_{i})(n_{i}-m_{i}+\beta_{i})}{(n_{i}+\alpha_{i}+\beta_{i}+1)(n_{i}+\alpha_{i}+\beta_{i})^2}<br>$$</p>
+<h2 id="Empirical-Bayesian-Inference"><a href="#Empirical-Bayesian-Inference" class="headerlink" title="Empirical Bayesian Inference"></a>Empirical Bayesian Inference</h2><h3 id="Estimating-a-prior-from-all-your-data"><a href="#Estimating-a-prior-from-all-your-data" class="headerlink" title="Estimating a prior from all your data"></a>Estimating a prior from all your data</h3><p>OK now we can empirically estimate $\alpha_0$ and $\beta_0$ for the prior beta distribution from all data points using MLE with the beta-binomial likelihood function first:</p>
+<p>$$\begin{split}<br>\mathcal{L}(\alpha, \beta) &amp;&#x3D; -\log \ell(\alpha, \beta) \\<br>&amp;&#x3D; -\sum \log \left(\frac{\Gamma(m+\alpha)\Gamma(n-m+\beta)&#x2F;\Gamma(n+\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)&#x2F;\Gamma(\alpha+\beta)}\right) \\<br>&amp;\text{(drop constant w.r.t. $\alpha$ and $\beta$)}<br>\end{split}$$</p>
+<p>Through reparameterization we could adjust for the total number of reads on one mismatch site, likewise we could correct for other confounding factors such as batch, sex, age, etc. To achieve this we are going to do <strong>regression</strong>:</p>
+<p>$$\begin{split}<br>\theta_i &amp; \sim \mathrm{Beta}(\mu_{i}, \rho_{i}) \\<br>\mu_{i} &amp; &#x3D; \sigma^{-1}(X^{T}\omega_{i} + \epsilon_{i})<br>\end{split}$$</p>
+<p>$\sigma$ is the logit link function, $X$ denotes a design matrix of confouding factors, $\omega_{i}$ denotes coefficients for the covariates in $X$, $\epsilon$ is the intercept. Potentially the matrix $X$ could be:<br>$$<br>X \sim \log(n) + \mathrm{batch} + \mathrm{group} + \mathrm{age} + …<br>$$</p>
+<p>Likewise we can get the negative log likelihood w.r.t $\mu$ and $\rho$:</p>
+<p>$$\begin{split}<br>\mathcal{L}(\mu, \rho) &#x3D; -\log(\ell(\mu,\rho)) &#x3D; -\sum_{i&#x3D;1}^{I} \log(P(m|\mu,\rho))<br>\end{split}$$</p>
+<h3 id="Updating-each-data-point"><a href="#Updating-each-data-point" class="headerlink" title="Updating each data point"></a>Updating each data point</h3><p>Just like the derivation shown above, we can update $\theta_{i}$ by calculating the expectation of its posterior distribution, <strong>expected a posterior (EAP)</strong>, as the solution is closed-form:</p>
+<p>$$\begin{split}<br>\alpha_{i} &amp;&#x3D; m_{i} + \alpha_{0} \\<br>\beta_{i} &amp;&#x3D; n_{i}-m_{i}+\beta_{0} \\<br>\hat{\theta_{i}}^{EAP} &amp;&#x3D; \frac{m_{i}+\alpha_{0}}{n_{i}+\alpha_{0}+\beta_{0}}<br>\end{split}$$</p>
+<h2 id="Example-code"><a href="#Example-code" class="headerlink" title="Example code"></a>Example code</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> stats</span><br><span class="line"><span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> minimize</span><br><span class="line"><span class="keyword">from</span> scipy.special <span class="keyword">import</span> expit, logit</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BetaBinomEmpiricalBayes</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, optim_method=<span class="string">&#x27;L-BFGS-B&#x27;</span></span>):</span><br><span class="line">        self.optim_method = optim_method</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">reparam_1</span>(<span class="params">self, α, β</span>):</span><br><span class="line">        μ = α / (α + β)</span><br><span class="line">        ρ = <span class="number">1</span> / (α + β + <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> μ, ρ</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">reparam_2</span>(<span class="params">self, μ, ρ</span>):</span><br><span class="line">        α = μ * (<span class="number">1</span> - ρ) / ρ</span><br><span class="line">        β = (<span class="number">1</span> - μ) * (<span class="number">1</span> - ρ) / ρ</span><br><span class="line">        <span class="keyword">return</span> α, β</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">neglog_likelihood</span>(<span class="params">self, params, *args</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        Negative log likelihood for beta-binom pdf</span></span><br><span class="line"><span class="string">        - params: list for parameters to be estimated</span></span><br><span class="line"><span class="string">        - args: 1d array containing data points</span></span><br><span class="line"><span class="string">        μ = σ^&#123;-1&#125;(Χω + ε)</span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span></span><br><span class="line">        ρ = params[<span class="number">0</span>]</span><br><span class="line">        ε = params[<span class="number">1</span>]</span><br><span class="line">        ω = params[<span class="number">2</span>]</span><br><span class="line">        </span><br><span class="line">        m = args[<span class="number">0</span>]</span><br><span class="line">        n = args[<span class="number">1</span>]</span><br><span class="line">        x = args[<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">        μ = expit(np.dot(x, ω) + ε)</span><br><span class="line">        α, β = self.reparam_2(μ, ρ)</span><br><span class="line">        logpdf = stats.betabinom.logpmf(k=m, n=n, a=α, b=β, loc=<span class="number">0</span>)</span><br><span class="line">        nll = -np.<span class="built_in">sum</span>(logpdf)</span><br><span class="line">        <span class="keyword">return</span> nll</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">neglog_likelihood_ab</span>(<span class="params">self, params, *args</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        Negative log likelihood for beta-binom pdf</span></span><br><span class="line"><span class="string">        - params: list for parameters to be estimated</span></span><br><span class="line"><span class="string">        - args: 1d array containing data points</span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span></span><br><span class="line">        a = params[<span class="number">0</span>]</span><br><span class="line">        b = params[<span class="number">1</span>]</span><br><span class="line">        </span><br><span class="line">        m = args[<span class="number">0</span>]</span><br><span class="line">        n = args[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">        logpdf = stats.betabinom.logpmf(k=m, n=n, a=a, b=b, loc=<span class="number">0</span>)</span><br><span class="line">        nll = -np.<span class="built_in">sum</span>(logpdf)</span><br><span class="line">        <span class="keyword">return</span> nll</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">fit_betabinom</span>(<span class="params">self, params_init, data, bounds</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;Maximum likelihood estimation&#x27;&#x27;&#x27;</span></span><br><span class="line">        res = minimize(self.neglog_likelihood,</span><br><span class="line">                       x0 = params_init,</span><br><span class="line">                       args = data,</span><br><span class="line">                       method = self.optim_method,</span><br><span class="line">                       bounds = bounds)</span><br><span class="line"></span><br><span class="line">        <span class="comment">#self.params_bb_mle = res.x</span></span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">post_reparam</span>(<span class="params">self, ρ, ω, x, ε</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        convert μ, ρ (post MLE) back to α, β</span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span></span><br><span class="line">        μ = expit(np.dot(x, ω) + ε)</span><br><span class="line">        α, β = self.reparam_2(μ, ρ)</span><br><span class="line">        <span class="keyword">return</span> α, β</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">update_alpha</span>(<span class="params">self, m, α</span>):</span><br><span class="line">        <span class="keyword">return</span> m + α</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">update_beta</span>(<span class="params">self, m, n, β</span>):</span><br><span class="line">        <span class="keyword">return</span> n - m + β</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">update_theta</span>(<span class="params">self, α_1, β_1</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        use the estimated params to update each datapoint&#x27;s </span></span><br><span class="line"><span class="string">        posterior θ (expectation and variance)</span></span><br><span class="line"><span class="string">        m, n are arrays</span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span></span><br><span class="line">        θ_expected = α_1 / (α_1 + β_1)</span><br><span class="line">        θ_var = (α_1 * β_1) / ((α_1 + β_1 + <span class="number">1</span>) * (α_1 + β_1)**<span class="number">2</span>)</span><br><span class="line">        <span class="keyword">return</span> θ_expected, θ_var</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">credible_interval</span>(<span class="params">self, alpha, beta</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;95% interval&#x27;&#x27;&#x27;</span></span><br><span class="line">        low = stats.beta.ppf(<span class="number">0.025</span>, alpha, beta, loc=<span class="number">0</span>, scale=<span class="number">1</span>)</span><br><span class="line">        high = stats.beta.ppf(<span class="number">0.975</span>, alpha, beta, loc=<span class="number">0</span>, scale=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> low, high</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">posterior_err_prob</span>(<span class="params">self, alpha, beta, cutoff</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;cumulative distribution function&#x27;&#x27;&#x27;</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            pep = stats.beta.cdf(cutoff, alpha, beta, loc=<span class="number">0</span>, scale=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            pep = <span class="built_in">float</span>(<span class="string">&#x27;inf&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span> pep</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">q_value</span>(<span class="params">self, pep</span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;cumulative mean of all sorted posterior error probabilities&#x27;&#x27;&#x27;</span></span><br><span class="line">        s = pd.Series(pep).sort_values()</span><br><span class="line">        <span class="keyword">return</span> s.cumsum()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">plot_beta_dist</span>(<span class="params">self, a, b, save_to=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        code is copied from </span></span><br><span class="line"><span class="string">        https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.beta.html</span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span></span><br><span class="line">        mean, var, skew, kurt = stats.beta.stats(a, b, moments=<span class="string">&#x27;mvsk&#x27;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&#x27;mean=<span class="subst">&#123;mean&#125;</span>, var=<span class="subst">&#123;var&#125;</span>, skew=<span class="subst">&#123;skew&#125;</span>, kurt=<span class="subst">&#123;kurt&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        fig, ax = plt.subplots(<span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">        x = np.linspace(stats.beta.ppf(<span class="number">0.01</span>, a, b),</span><br><span class="line">                        stats.beta.ppf(<span class="number">0.99</span>, a, b), <span class="number">100</span>)</span><br><span class="line">        ax.plot(x, stats.beta.pdf(x, a, b),</span><br><span class="line">               <span class="string">&#x27;r-&#x27;</span>, lw=<span class="number">3.5</span>, alpha=<span class="number">0.6</span>, label=<span class="string">&#x27;beta pdf&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        r = stats.beta.rvs(a, b, size=<span class="number">1000</span>)</span><br><span class="line">        ax.hist(r, density=<span class="literal">True</span>, bins=<span class="number">30</span>, histtype=<span class="string">&#x27;stepfilled&#x27;</span>, alpha=<span class="number">0.2</span>)</span><br><span class="line">        ax.legend(loc=<span class="string">&#x27;best&#x27;</span>, frameon=<span class="literal">False</span>)</span><br><span class="line">        plt.title(<span class="string">f&#x27;a=<span class="subst">&#123;<span class="string">&quot;%.4f&quot;</span> % a&#125;</span>, b=<span class="subst">&#123;<span class="string">&quot;%.4f&quot;</span> % b&#125;</span>&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> save_to:</span><br><span class="line">            plt.save(save_to)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            plt.show()</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_bb_eBayes</span>(<span class="params">table, ab_mode=<span class="literal">False</span></span>):</span><br><span class="line">    <span class="comment"># table is a pandas table</span></span><br><span class="line">    m = table[<span class="string">&#x27;m&#x27;</span>].to_numpy()</span><br><span class="line">    n = table[<span class="string">&#x27;n&#x27;</span>].to_numpy()</span><br><span class="line">    log_n = np.log(n)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> ab_mode:</span><br><span class="line">        <span class="comment"># ρ, ε, ω</span></span><br><span class="line">        params_init = np.array([<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.8</span>])</span><br><span class="line">        <span class="comment"># MLE</span></span><br><span class="line">        reg = BetaBinomEmpiricalBayes(optim_method=<span class="string">&#x27;L-BFGS-B&#x27;</span>)</span><br><span class="line">        res = reg.fit_betabinom(params_init=params_init, </span><br><span class="line">                                data=(m, n, log_n),</span><br><span class="line">                                bounds=[(<span class="number">0.001</span>, <span class="literal">None</span>),</span><br><span class="line">                                        (<span class="literal">None</span>, <span class="literal">None</span>),</span><br><span class="line">                                        (<span class="literal">None</span>, <span class="literal">None</span>)])</span><br><span class="line">        <span class="comment"># update each datapoint</span></span><br><span class="line">        ρ, ε, ω = res.x</span><br><span class="line">        params = <span class="string">f&#x27;ρ=<span class="subst">&#123;<span class="string">&quot;%.4f&quot;</span> % ρ&#125;</span>,ε=<span class="subst">&#123;<span class="string">&quot;%.4f&quot;</span> % ε&#125;</span>,ω=<span class="subst">&#123;<span class="string">&quot;%.4f&quot;</span> % ω&#125;</span>&#x27;</span></span><br><span class="line">        α_0, β_0 = reg.post_reparam(ρ=ρ, ω=ω, x=log_n, ε=ε)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="comment"># α, β</span></span><br><span class="line">        params_init = np.array([<span class="number">1</span>, <span class="number">1</span>])</span><br><span class="line">        <span class="comment"># MLE</span></span><br><span class="line">        res = reg.fit_betabinom(params_init=params_init, </span><br><span class="line">                                data=(m, n),</span><br><span class="line">                                bounds=[(<span class="number">0.001</span>, <span class="literal">None</span>),</span><br><span class="line">                                        (<span class="number">0.001</span>, <span class="literal">None</span>)])</span><br><span class="line">        <span class="comment"># update each datapoint</span></span><br><span class="line">        α_0, β_0 = res.x</span><br><span class="line">        params = <span class="string">f&#x27;a=<span class="subst">&#123;<span class="string">&quot;%.4f&quot;</span> % α_0&#125;</span>,b=<span class="subst">&#123;<span class="string">&quot;%.4f&quot;</span> % β_0&#125;</span>&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    α_1 = reg.update_alpha(m, α_0)</span><br><span class="line">    β_1 = reg.update_beta(m, n, β_0)</span><br><span class="line">    θ_expected, θ_var = reg.update_theta(α_1, β_1)</span><br><span class="line">    table[<span class="string">&#x27;α_1&#x27;</span>] = [<span class="string">&quot;%.3f&quot;</span> % a <span class="keyword">for</span> a <span class="keyword">in</span> α_1]</span><br><span class="line">    table[<span class="string">&#x27;β_1&#x27;</span>] = [<span class="string">&quot;%.3f&quot;</span> % b <span class="keyword">for</span> b <span class="keyword">in</span> β_1]</span><br><span class="line">    table[<span class="string">&#x27;freq&#x27;</span>] = [<span class="string">&quot;%.4f&quot;</span> % f <span class="keyword">for</span> f <span class="keyword">in</span> (m/n)]</span><br><span class="line">    table[<span class="string">&#x27;eb_freq&#x27;</span>] = [<span class="string">&quot;%.4f&quot;</span> % e <span class="keyword">for</span> e <span class="keyword">in</span> θ_expected]</span><br><span class="line">    table[<span class="string">&#x27;eb_var&#x27;</span>] = [<span class="string">&quot;&#123;:.3e&#125;&quot;</span>.<span class="built_in">format</span>(v) <span class="keyword">for</span> v <span class="keyword">in</span> θ_var]</span><br><span class="line">    table = table.sort_values(by=[<span class="string">&#x27;eb_var&#x27;</span>]).\</span><br><span class="line">                  sort_values(by=[<span class="string">&#x27;eb_freq&#x27;</span>], ascending=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> table, params</span><br></pre></td></tr></table></figure>
+
+<p>P.S. please correct me if I wrote anything wrong ;)</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/play-with-align-files/">Playing with fastq/BAM using awk and Python</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+
+            </div>
+            
+  <div id="disqus_thread"></div>
+  <script>
+      /**
+      *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+      *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+      var disqus_config = function () {
+        this.page.url = 'https://chilampoon.github.io/2023/beta-binom-ebayes/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = '1673314235000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+      };
+      (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://chilampoon.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© poonchilam | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

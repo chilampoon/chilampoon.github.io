@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="chilampoon">
+
+
+
+
+
+<title>Implementations of tissue-aware normalization for RNA-seq data | Hexo</title>
+
+
+
+    <link rel="icon" href="/image/kitty.png">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Waking up</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Waking up</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Implementations of tissue-aware normalization for RNA-seq data</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">chilampoon</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">December 25, 2019&nbsp;&nbsp;15:47:48</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="Filtering-genes"><a href="#Filtering-genes" class="headerlink" title="Filtering genes"></a>Filtering genes</h2><p>I am manipulating GTEx v8 data, so I first filtered lowly-expressed genes after some prepossesses:</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">library<span class="punctuation">(</span>edgeR<span class="punctuation">)</span></span><br><span class="line">tissue.no <span class="operator">&lt;-</span> pData<span class="punctuation">(</span>eset<span class="punctuation">)</span> <span class="operator">%&gt;%</span></span><br><span class="line">             group_by<span class="punctuation">(</span>SMTSD<span class="punctuation">)</span> <span class="operator">%&gt;%</span></span><br><span class="line">             summarise<span class="punctuation">(</span>n<span class="operator">=</span>n<span class="punctuation">(</span><span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># in tissue-aware manner, refer to YARN paper</span></span><br><span class="line"><span class="built_in">min</span><span class="punctuation">(</span>tissue.no<span class="operator">$</span>n<span class="punctuation">)</span> <span class="comment">#113</span></span><br><span class="line">minSamples <span class="operator">&lt;-</span> <span class="built_in">floor</span><span class="punctuation">(</span><span class="built_in">min</span><span class="punctuation">(</span>tissue.no<span class="operator">$</span>n<span class="punctuation">)</span><span class="operator">/</span><span class="number">2</span><span class="punctuation">)</span></span><br><span class="line">cnt.cpm <span class="operator">&lt;-</span> cpm<span class="punctuation">(</span>exprs<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">keep <span class="operator">&lt;-</span> rowSums<span class="punctuation">(</span>cnt.cpm <span class="operator">&gt;</span> <span class="number">1</span><span class="punctuation">)</span> <span class="operator">&gt;=</span> minSamples</span><br><span class="line">eset <span class="operator">&lt;-</span> eset<span class="punctuation">[</span>keep<span class="punctuation">,</span><span class="punctuation">]</span></span><br><span class="line"><span class="built_in">dim</span><span class="punctuation">(</span>eset<span class="punctuation">)</span></span><br><span class="line"><span class="comment">## Features  Samples</span></span><br><span class="line"><span class="comment">##    29212    14437</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Normalization-comparisons"><a href="#Normalization-comparisons" class="headerlink" title="Normalization comparisons"></a>Normalization comparisons</h2><p>Normalize selected samples in tissue-aware way.</p>
+<ol>
+<li>TMM: trimmed mean of M-values</li>
+<li>RLE: relative log expression</li>
+<li>UQ: upper quartile</li>
+<li>DESeq: median-ratio-scaling</li>
+<li>QN: quantile normalization</li>
+<li>qsmooth: smooth quantile normalization</li>
+<li>none: original data</li>
+</ol>
+<p>The following is a simple function to perform all of these, extended the one in <code>yarn</code>.</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## tissue aware normalization, all returing log2-transformed cpm since limma uses cpm</span></span><br><span class="line">tissue.aware.norm <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>eset<span class="punctuation">,</span> group<span class="punctuation">,</span> method<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="string">&#x27;TMM&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;RLE&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;UQ&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;DESeq&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;QN&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;qsmooth&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;none&#x27;</span><span class="punctuation">)</span><span class="punctuation">,</span> logOutput<span class="operator">=</span><span class="literal">TRUE</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  suppressPackageStartupMessages<span class="punctuation">(</span><span class="punctuation">&#123;</span></span><br><span class="line">    library<span class="punctuation">(</span>edgeR<span class="punctuation">)</span></span><br><span class="line">    library<span class="punctuation">(</span>doParallel<span class="punctuation">)</span></span><br><span class="line">    library<span class="punctuation">(</span>preprocessCore<span class="punctuation">)</span></span><br><span class="line">    library<span class="punctuation">(</span>DESeq2<span class="punctuation">)</span></span><br><span class="line">    library<span class="punctuation">(</span>qsmooth<span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">)</span></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span><span class="built_in">length</span><span class="punctuation">(</span>group<span class="punctuation">)</span> <span class="operator">==</span> <span class="number">1</span><span class="punctuation">)</span> tissues <span class="operator">&lt;-</span> factor<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># function to retrieve normalized counts from dge list</span></span><br><span class="line">  getDGEcnts <span class="operator">&lt;-</span> <span class="keyword">function</span> <span class="punctuation">(</span>dge<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    dge <span class="operator">&lt;-</span> estimateCommonDisp<span class="punctuation">(</span>dge<span class="punctuation">)</span></span><br><span class="line">    dge <span class="operator">&lt;-</span> estimateTagwiseDisp<span class="punctuation">(</span>dge<span class="punctuation">)</span></span><br><span class="line">    norm.cnts <span class="operator">&lt;-</span> t<span class="punctuation">(</span>t<span class="punctuation">(</span>dge<span class="operator">$</span>pseudo.counts<span class="punctuation">)</span><span class="operator">*</span><span class="punctuation">(</span>dge<span class="operator">$</span>samples<span class="operator">$</span>norm.factors<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">    norm.cnts</span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span>method <span class="operator">==</span> <span class="string">&#x27;TMM&#x27;</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="comment"># weights are from the delta method on Binomial data</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> foreach<span class="punctuation">(</span>tissue <span class="operator">=</span> unique<span class="punctuation">(</span>tissues<span class="punctuation">)</span><span class="punctuation">,</span> .combine <span class="operator">=</span> cbind<span class="punctuation">)</span> <span class="operator">%dopar%</span> <span class="punctuation">&#123;</span></span><br><span class="line">      cnts <span class="operator">&lt;-</span> exprs<span class="punctuation">(</span>eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span> <span class="operator">%in%</span> tissue<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> DGEList<span class="punctuation">(</span>cnts<span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> calcNormFactors<span class="punctuation">(</span>dge<span class="punctuation">,</span> method <span class="operator">=</span> <span class="string">&#x27;TMM&#x27;</span><span class="punctuation">)</span></span><br><span class="line">      norm.cnts <span class="operator">&lt;-</span> getDGEcnts<span class="punctuation">(</span>dge<span class="punctuation">)</span></span><br><span class="line">      norm.cnts</span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span> <span class="keyword">else</span> <span class="keyword">if</span> <span class="punctuation">(</span>method <span class="operator">==</span> <span class="string">&#x27;RLE&#x27;</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="comment"># the median ratio of each sample to the median library (geometric mean of all columns) is taken as the scale factor</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> foreach<span class="punctuation">(</span>tissue <span class="operator">=</span> unique<span class="punctuation">(</span>tissues<span class="punctuation">)</span><span class="punctuation">,</span> .combine <span class="operator">=</span> cbind<span class="punctuation">)</span> <span class="operator">%dopar%</span> <span class="punctuation">&#123;</span></span><br><span class="line">      cnts <span class="operator">&lt;-</span> exprs<span class="punctuation">(</span>eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span> <span class="operator">%in%</span> tissue<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> DGEList<span class="punctuation">(</span>cnts<span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> calcNormFactors<span class="punctuation">(</span>dge<span class="punctuation">,</span> method <span class="operator">=</span> <span class="string">&#x27;RLE&#x27;</span><span class="punctuation">)</span></span><br><span class="line">      norm.cnts <span class="operator">&lt;-</span> getDGEcnts<span class="punctuation">(</span>dge<span class="punctuation">)</span></span><br><span class="line">      norm.cnts</span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span> <span class="keyword">else</span> <span class="keyword">if</span> <span class="punctuation">(</span>method <span class="operator">==</span> <span class="string">&#x27;UQ&#x27;</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="comment"># the scale factors are calculated from the 75% quantile of the counts for each library</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> foreach<span class="punctuation">(</span>tissue <span class="operator">=</span> unique<span class="punctuation">(</span>tissues<span class="punctuation">)</span><span class="punctuation">,</span> .combine <span class="operator">=</span> cbind<span class="punctuation">)</span> <span class="operator">%dopar%</span> <span class="punctuation">&#123;</span></span><br><span class="line">      cnts <span class="operator">&lt;-</span> exprs<span class="punctuation">(</span>eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span> <span class="operator">%in%</span> tissue<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> DGEList<span class="punctuation">(</span>cnts<span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> calcNormFactors<span class="punctuation">(</span>dge<span class="punctuation">,</span> method <span class="operator">=</span> <span class="string">&#x27;upperquartile&#x27;</span><span class="punctuation">)</span></span><br><span class="line">      norm.cnts <span class="operator">&lt;-</span> getDGEcnts<span class="punctuation">(</span>dge<span class="punctuation">)</span></span><br><span class="line">      norm.cnts</span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span> <span class="keyword">else</span> <span class="keyword">if</span> <span class="punctuation">(</span>method <span class="operator">==</span> <span class="string">&#x27;none&#x27;</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="comment"># scale factors are 1</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> foreach<span class="punctuation">(</span>tissue <span class="operator">=</span> unique<span class="punctuation">(</span>tissues<span class="punctuation">)</span><span class="punctuation">,</span> .combine <span class="operator">=</span> cbind<span class="punctuation">)</span> <span class="operator">%dopar%</span> <span class="punctuation">&#123;</span></span><br><span class="line">      cnts <span class="operator">&lt;-</span> exprs<span class="punctuation">(</span>eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span> <span class="operator">%in%</span> tissue<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> DGEList<span class="punctuation">(</span>cnts<span class="punctuation">)</span></span><br><span class="line">      dge <span class="operator">&lt;-</span> calcNormFactors<span class="punctuation">(</span>dge<span class="punctuation">,</span> method <span class="operator">=</span> <span class="string">&#x27;none&#x27;</span><span class="punctuation">)</span></span><br><span class="line">      norm.cnts <span class="operator">&lt;-</span> getDGEcnts<span class="punctuation">(</span>dge<span class="punctuation">)</span></span><br><span class="line">      norm.cnts</span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span> <span class="keyword">else</span> <span class="keyword">if</span> <span class="punctuation">(</span>method <span class="operator">==</span> <span class="string">&#x27;DESeq&#x27;</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="comment"># counts divided by median ratio of gene counts relative to geometric mean per gene</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> foreach<span class="punctuation">(</span>tissue <span class="operator">=</span> unique<span class="punctuation">(</span>tissues<span class="punctuation">)</span><span class="punctuation">,</span> .combine <span class="operator">=</span> cbind<span class="punctuation">)</span> <span class="operator">%dopar%</span> <span class="punctuation">&#123;</span></span><br><span class="line">      cnts <span class="operator">&lt;-</span> exprs<span class="punctuation">(</span>eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span> <span class="operator">%in%</span> tissue<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line">      dds <span class="operator">&lt;-</span> DESeqDataSetFromMatrix<span class="punctuation">(</span>countData <span class="operator">=</span> cnts<span class="punctuation">,</span> colData <span class="operator">=</span> pData<span class="punctuation">(</span>eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span> <span class="operator">%in%</span> tissue<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">,</span> design <span class="operator">=</span> <span class="operator">~</span> <span class="number">1</span><span class="punctuation">)</span></span><br><span class="line">      dds <span class="operator">&lt;-</span> estimateSizeFactors<span class="punctuation">(</span>dds<span class="punctuation">)</span></span><br><span class="line">      <span class="comment">#cpm &lt;- fpm(dds, robust = T) #a robust method using specific library sizes</span></span><br><span class="line">      norm.cnts <span class="operator">&lt;-</span> counts<span class="punctuation">(</span>dds<span class="punctuation">,</span> normalized<span class="operator">=</span><span class="built_in">T</span><span class="punctuation">)</span></span><br><span class="line">      norm.cnts</span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span> <span class="keyword">else</span> <span class="keyword">if</span> <span class="punctuation">(</span>method <span class="operator">==</span> <span class="string">&#x27;QN&#x27;</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> foreach<span class="punctuation">(</span>tissue <span class="operator">=</span> unique<span class="punctuation">(</span>tissues<span class="punctuation">)</span><span class="punctuation">,</span> .combine <span class="operator">=</span> cbind<span class="punctuation">)</span> <span class="operator">%dopar%</span> <span class="punctuation">&#123;</span></span><br><span class="line">      cnts <span class="operator">&lt;-</span> exprs<span class="punctuation">(</span>eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">[</span><span class="punctuation">,</span> group<span class="punctuation">]</span> <span class="operator">%in%</span> tissue<span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line">      norm.cnts <span class="operator">&lt;-</span> normalize.quantiles<span class="punctuation">(</span>cnts<span class="punctuation">,</span> copy<span class="operator">=</span><span class="built_in">F</span><span class="punctuation">)</span></span><br><span class="line">      norm.cnts</span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span> <span class="keyword">else</span> <span class="keyword">if</span> <span class="punctuation">(</span>method <span class="operator">==</span> <span class="string">&#x27;qsmooth&#x27;</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    exprs <span class="operator">&lt;-</span> exprs<span class="punctuation">(</span>eset<span class="punctuation">)</span></span><br><span class="line">    qs <span class="operator">&lt;-</span> qsmooth<span class="punctuation">(</span>exprs<span class="punctuation">,</span> group_factor <span class="operator">=</span> tissues<span class="punctuation">)</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> qsmoothData<span class="punctuation">(</span>qs<span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span> <span class="keyword">else</span> <span class="punctuation">&#123;</span></span><br><span class="line">    stop<span class="punctuation">(</span><span class="string">&#x27;YEEEE... code it by yourself if you wanna do it.&#x27;</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> <span class="punctuation">(</span>logOutput<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    normalizedMatrix <span class="operator">&lt;-</span> log2<span class="punctuation">(</span>normalizedMatrix <span class="operator">+</span> <span class="number">1</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  normalizedMatrix <span class="operator">&lt;-</span> normalizedMatrix<span class="punctuation">[</span><span class="punctuation">,</span> match<span class="punctuation">(</span>rownames<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span> colnames<span class="punctuation">(</span>normalizedMatrix<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">]</span></span><br><span class="line">  normalizedMatrix</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Visualizing-distributions"><a href="#Visualizing-distributions" class="headerlink" title="Visualizing distributions"></a>Visualizing distributions</h2><p>I picked some tissues to see their distribution.</p>
+<p>Some helper functions:</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">getColors <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>vec<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="comment"># assgin a color to each group of samples</span></span><br><span class="line">  library<span class="punctuation">(</span>RColorBrewer<span class="punctuation">)</span></span><br><span class="line">  n <span class="operator">&lt;-</span> <span class="built_in">length</span><span class="punctuation">(</span>unique<span class="punctuation">(</span>vec<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">  col <span class="operator">&lt;-</span> brewer.pal<span class="punctuation">(</span>n<span class="punctuation">,</span> <span class="string">&quot;Paired&quot;</span><span class="punctuation">)</span></span><br><span class="line">  <span class="comment">#col &lt;- brewer.pal.info[brewer.pal.info$category==&#x27;qual&#x27;, ] # get max. 74 colours</span></span><br><span class="line">  <span class="comment">#col_all &lt;- unlist(mapply(brewer.pal, col$maxcolors, rownames(col)))</span></span><br><span class="line">  ifelse <span class="punctuation">(</span>n <span class="operator">&gt;</span> <span class="built_in">length</span><span class="punctuation">(</span>col<span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">          cvec <span class="operator">&lt;-</span> sample<span class="punctuation">(</span>col<span class="punctuation">,</span> n<span class="punctuation">,</span> replace<span class="operator">=</span><span class="built_in">T</span><span class="punctuation">)</span><span class="punctuation">,</span></span><br><span class="line">          cvec <span class="operator">&lt;-</span> sample<span class="punctuation">(</span>col<span class="punctuation">,</span> n<span class="punctuation">,</span> replace<span class="operator">=</span><span class="built_in">F</span><span class="punctuation">)</span></span><br><span class="line">  <span class="punctuation">)</span></span><br><span class="line">  vec <span class="operator">&lt;-</span> <span class="built_in">as.character</span><span class="punctuation">(</span>vec<span class="punctuation">)</span></span><br><span class="line">  <span class="built_in">names</span><span class="punctuation">(</span>vec<span class="punctuation">)</span> <span class="operator">&lt;-</span> <span class="built_in">rep</span><span class="punctuation">(</span><span class="literal">NA</span><span class="punctuation">,</span> <span class="built_in">length</span><span class="punctuation">(</span>vec<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line">  <span class="keyword">for</span> <span class="punctuation">(</span>g <span class="keyword">in</span> <span class="number">1</span><span class="operator">:</span><span class="built_in">length</span><span class="punctuation">(</span>unique<span class="punctuation">(</span>vec<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="built_in">names</span><span class="punctuation">(</span>vec<span class="punctuation">)</span><span class="punctuation">[</span>which<span class="punctuation">(</span>vec<span class="operator">==</span>unique<span class="punctuation">(</span>vec<span class="punctuation">)</span><span class="punctuation">[</span>g<span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">]</span> <span class="operator">&lt;-</span> cvec<span class="punctuation">[</span>g<span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line">  vec</span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dens.plot <span class="operator">&lt;-</span> <span class="keyword">function</span><span class="punctuation">(</span>table<span class="punctuation">,</span> colVec<span class="punctuation">,</span> ...<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  cols <span class="operator">&lt;-</span> <span class="built_in">names</span><span class="punctuation">(</span>colVec<span class="punctuation">)</span></span><br><span class="line">  d <span class="operator">&lt;-</span> plot<span class="punctuation">(</span>density<span class="punctuation">(</span>table<span class="punctuation">[</span><span class="punctuation">,</span> <span class="number">1</span><span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">,</span> col<span class="operator">=</span>cols<span class="punctuation">[</span><span class="number">1</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">            lwd<span class="operator">=</span><span class="number">2</span><span class="punctuation">,</span> las<span class="operator">=</span><span class="number">2</span><span class="punctuation">,</span> xlab<span class="operator">=</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span> ...<span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">    abline<span class="punctuation">(</span>v<span class="operator">=</span><span class="number">0</span><span class="punctuation">,</span> lty<span class="operator">=</span><span class="number">3</span><span class="punctuation">)</span> <span class="operator">+</span> title<span class="punctuation">(</span>xlab<span class="operator">=</span><span class="string">&quot;log2 exprs&quot;</span><span class="punctuation">,</span> ylab<span class="operator">=</span><span class="literal">NA</span><span class="punctuation">)</span> <span class="operator">+</span></span><br><span class="line">    <span class="keyword">for</span> <span class="punctuation">(</span>i <span class="keyword">in</span> <span class="number">2</span><span class="operator">:</span>ncol<span class="punctuation">(</span>table<span class="punctuation">)</span><span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">      den <span class="operator">&lt;-</span> density<span class="punctuation">(</span>table<span class="punctuation">[</span><span class="punctuation">,</span> i<span class="punctuation">]</span><span class="punctuation">)</span></span><br><span class="line">      lines<span class="punctuation">(</span>den<span class="operator">$</span>x<span class="punctuation">,</span> den<span class="operator">$</span>y<span class="punctuation">,</span> col<span class="operator">=</span>cols<span class="punctuation">[</span>i<span class="punctuation">]</span><span class="punctuation">,</span> lwd<span class="operator">=</span><span class="number">2</span><span class="punctuation">)</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  legend<span class="punctuation">(</span><span class="string">&#x27;topright&#x27;</span><span class="punctuation">,</span> legend<span class="operator">=</span>unique<span class="punctuation">(</span>colVector<span class="punctuation">)</span><span class="punctuation">,</span> lty<span class="operator">=</span><span class="number">1</span><span class="punctuation">,</span> col<span class="operator">=</span>unique<span class="punctuation">(</span><span class="built_in">names</span><span class="punctuation">(</span>colVector<span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">,</span> cex<span class="operator">=</span><span class="number">0.6</span><span class="punctuation">)</span></span><br><span class="line">  d</span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>Plot distributions:</p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">selectt <span class="operator">&lt;-</span> <span class="built_in">c</span><span class="punctuation">(</span><span class="string">&#x27;Brain - Amygdala&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;Artery - Aorta&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;Heart - Atrial Appendage&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;Whole Blood&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;Testis&#x27;</span><span class="punctuation">)</span></span><br><span class="line">sub.eset <span class="operator">&lt;-</span> eset<span class="punctuation">[</span><span class="punctuation">,</span> which<span class="punctuation">(</span>pData<span class="punctuation">(</span>eset<span class="punctuation">)</span><span class="operator">$</span>SMTSD <span class="operator">%in%</span> selectt<span class="punctuation">)</span><span class="punctuation">]</span></span><br><span class="line"><span class="built_in">dim</span><span class="punctuation">(</span>sub.eset<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">dist.list <span class="operator">&lt;-</span> <span class="built_in">list</span><span class="punctuation">(</span><span class="punctuation">)</span></span><br><span class="line">methods <span class="operator">&lt;-</span> <span class="built_in">c</span><span class="punctuation">(</span><span class="string">&#x27;TMM&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;RLE&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;UQ&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;DESeq&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;QN&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;qsmooth&#x27;</span><span class="punctuation">,</span> <span class="string">&#x27;none&#x27;</span><span class="punctuation">)</span></span><br><span class="line"><span class="keyword">for</span> <span class="punctuation">(</span>n <span class="keyword">in</span> methods<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  dist.list<span class="punctuation">[[</span>n<span class="punctuation">]</span><span class="punctuation">]</span> <span class="operator">&lt;-</span> tissue.aware.norm<span class="punctuation">(</span>sub.eset<span class="punctuation">,</span> <span class="string">&quot;SMTSD&quot;</span><span class="punctuation">,</span> n<span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">#saveRDS(dist.list, file=&#x27;~/cvd/v8/exprs/norm.cpm.rds&#x27;)</span></span><br><span class="line"></span><br><span class="line">sub.p <span class="operator">&lt;-</span> pData<span class="punctuation">(</span>sub.eset<span class="punctuation">)</span></span><br><span class="line">sub.p<span class="operator">$</span>SMTSD <span class="operator">&lt;-</span> factor<span class="punctuation">(</span>sub.p<span class="operator">$</span>SMTSD<span class="punctuation">)</span></span><br><span class="line">sub.p <span class="operator">&lt;-</span> sub.p<span class="punctuation">[</span>order<span class="punctuation">(</span>sub.p<span class="operator">$</span>SMTSD<span class="punctuation">)</span><span class="punctuation">,</span><span class="punctuation">]</span></span><br><span class="line">colVector <span class="operator">&lt;-</span> getColors<span class="punctuation">(</span>sub.p<span class="operator">$</span>SMTSD<span class="punctuation">)</span></span><br><span class="line"></span><br><span class="line">mypar<span class="punctuation">(</span><span class="number">3</span><span class="punctuation">,</span> <span class="number">3</span><span class="punctuation">)</span></span><br><span class="line"><span class="keyword">for</span> <span class="punctuation">(</span>n <span class="keyword">in</span> methods<span class="punctuation">)</span> <span class="punctuation">&#123;</span></span><br><span class="line">  print<span class="punctuation">(</span>dens.plot<span class="punctuation">(</span>dist.list<span class="punctuation">[[</span>n<span class="punctuation">]</span><span class="punctuation">]</span><span class="punctuation">[</span><span class="punctuation">,</span>match<span class="punctuation">(</span>rownames<span class="punctuation">(</span>sub.p<span class="punctuation">)</span><span class="punctuation">,</span> colnames<span class="punctuation">(</span>dist.list<span class="punctuation">[[</span>n<span class="punctuation">]</span><span class="punctuation">]</span><span class="punctuation">)</span><span class="punctuation">)</span><span class="punctuation">]</span><span class="punctuation">,</span> colVector<span class="punctuation">,</span> ylim<span class="operator">=</span><span class="built_in">c</span><span class="punctuation">(</span><span class="number">0</span><span class="punctuation">,</span> <span class="number">0.3</span><span class="punctuation">)</span><span class="punctuation">,</span> main<span class="operator">=</span>n<span class="punctuation">)</span><span class="punctuation">)</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<img src="/image/posts/RNA-norm/distributions.png" alt="distributions" width="1000"/>
+
+<p>I am not sure why there are still many lowly-expressed genes in some of these tissues, testis looks good though. The first three - TMM, RLE, UQ - are quite similar; DESeq method seems the same as none…</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/play-with-align-files/">Playing with fastq/BAM using awk and Python</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+
+            </div>
+            
+  <div id="disqus_thread"></div>
+  <script>
+      /**
+      *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+      *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+      var disqus_config = function () {
+        this.page.url = 'https://chilampoon.github.io/2019/imple-rna-seq/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = '1577306868000'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+      };
+      (function() { // DON'T EDIT BELOW THIS LINE
+      var d = document, s = d.createElement('script');
+      s.src = 'https://chilampoon.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© poonchilam | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
