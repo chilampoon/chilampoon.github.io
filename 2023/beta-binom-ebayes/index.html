@@ -249,7 +249,7 @@
         </header>
 
         <div class="post-content">
-            <h2 id="Beta-binomial-model"><a href="#Beta-binomial-model" class="headerlink" title="Beta-binomial model"></a>Beta-binomial model</h2><p>Here I am using the simpliest beta-binomail model. Suppose we observed $n$ reads covering a mismatch position $i$, of which $m$ reads harbor an allele that is considered mutated. Mutation rate $\theta_{i}$ follows a beta distribution.</p>
+            <h2 id="Beta-binomial-model"><a href="#Beta-binomial-model" class="headerlink" title="Beta-binomial model"></a>Beta-binomial model</h2><p>Here I am using the simpliest beta-binomial model. Suppose we observed $n$ reads covering a mismatch position $i$, of which $m$ reads harbor an allele that is considered mutated. Mutation rate $\theta_{i}$ follows a beta distribution.</p>
 <p>$$\begin{split}<br>m_{i} &amp;\sim \text{Binom}(n_{i}, \theta_{i}) \\<br>\theta_{i} &amp;\sim \text{Beta}(\alpha_{i}, \beta_{i})<br>\end{split}$$</p>
 <p>We know that</p>
 <p>$$<br>\theta \sim \text{Beta}(\alpha, \beta) &#x3D; \text{Beta}(\theta|\alpha, \beta) &#x3D; \frac{\theta^{\alpha-1}(1-\theta)^{\beta-1}}{\text{B}(\alpha, \beta)}<br>$$</p>

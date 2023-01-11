@@ -149,7 +149,7 @@ template {
   font-display: swap;
 }
 html {
-  font-family: 'Lora';
+  font-family: 'Lora', Arial;
 }
 html::-webkit-scrollbar {
   width: 8px;
