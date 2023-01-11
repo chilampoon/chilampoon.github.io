@@ -149,7 +149,7 @@ template {
   font-display: swap;
 }
 html {
-  font-family: 'Lora', Arial;
+  font-family: 'Lora', Arial, 'Microsoft Jhenghei';
 }
 html::-webkit-scrollbar {
   width: 8px;
